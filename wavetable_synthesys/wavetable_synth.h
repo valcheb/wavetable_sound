@@ -1,5 +1,0 @@
-#ifndef WAVETABLE_SYNTH_H_
-#define WAVETABLE_SYNTH_H_
-
-
-#endif /* WAVETABLE_SYNTH_H_ */
