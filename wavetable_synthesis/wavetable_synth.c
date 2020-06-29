@@ -75,22 +75,16 @@ inline static bool wts_is_note_byte(uint16_t byte)
 }
 
 /*synth*/
-volatile static int a = 0;
 inline static uint8_t wts_linear_interpole(uint16_t *arr, uint32_t i)
 {
-    uint32_t floor = i/100;
-    uint32_t ceil = floor+1;
-    int top = arr[ceil];
-    int bottom = arr[floor];
-
-    if (floor >= 252)
-    {
-        a++;
-    }
+    uint32_t floor = i;
+    uint32_t ceil = floor+ACCURACY;
+    uint8_t top = arr[ceil/ACCURACY];
+    uint8_t bottom = arr[floor/ACCURACY];
 
     return (uint8_t)
     (
-        (top - bottom) * (int)(i - floor*ACCURACY)/ACCURACY + bottom
+        (top - bottom) * (i - floor)/ACCURACY + bottom
     );
 }
 
