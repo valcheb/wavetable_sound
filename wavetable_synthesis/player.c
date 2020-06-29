@@ -10,11 +10,13 @@
 
 void pl_init()
 {
-    ma_init_mcu(); //здесь должен быть учет частоты дискретизации и расширения частоты для raw
+    ma_init_mcu();
 #ifdef PLAY_RAW //вместо кучи ifdef можно использовать структуру с указателями на функции
     raw_init();
+    ma_set_expand(6); //mcu_rate/song_rate
 #else
     wts_init();
+    ma_set_expand(1);
 #endif
 }
 
@@ -28,7 +30,7 @@ void pl_stop_play()
     ma_disable_pwm();
 }
 
-void pl_play_song()
+void pl_play_song() //TODO rewrite with argument but reduce global variables
 {
 #ifdef PLAY_RAW
     if (ma_is_data_needed())
@@ -43,7 +45,7 @@ void pl_play_song()
 
     if (ma_is_data_needed() && !wts_is_empty())
     {
-            ma_pwm_play(wts_get_value());
+        ma_pwm_play(wts_get_value());
     }
 #endif
 }
@@ -56,11 +58,3 @@ bool pl_is_continue()
     return wts_is_continue();
 #endif
 }
-/*
-
-player_init : wts_init - raw_init
-player_start : ma_enable
-player_stop : ma_disable
-player_play : play_syth - play_raw
-
-*/

@@ -6,7 +6,6 @@ static uint32_t i = 0;
 void raw_init()
 {
     song_len = SONG_LEN;
-    //set_freq_expand();
 }
 
 bool raw_is_continue()

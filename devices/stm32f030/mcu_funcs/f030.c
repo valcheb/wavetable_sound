@@ -1,7 +1,6 @@
 #include "f030.h"
 
 #define TIMER_PERIOD 6000/6 //48kHz PWM freq
-#define FREQ_EXPAND_COEF 1*6 //for raw dindon 8kHz
 
 void f030_msDelay(uint32_t ms)
 {
@@ -77,6 +76,7 @@ void f030_disable_pwm()
 /*pwm_player*/
 volatile static uint8_t tim_i = 0;
 volatile static bool need_data = true;
+static uint8_t freq_expand = 0;
 
 inline static void f030_send_to_pwm(uint8_t data)
 {
@@ -89,6 +89,11 @@ void f030_pwm_play(uint8_t data)
     f030_send_to_pwm(data);
 }
 
+void f030_set_expand(uint8_t value)
+{
+    freq_expand = value;
+}
+
 bool f030_is_data_needed()
 {
     return need_data;
@@ -97,7 +102,7 @@ bool f030_is_data_needed()
 void TIM14_IRQHandler()
 {
     tim_i++;
-    if (tim_i == FREQ_EXPAND_COEF)
+    if (tim_i == freq_expand)
     {
         tim_i = 0;
         need_data = true;

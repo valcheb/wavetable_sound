@@ -14,6 +14,7 @@ void f030_init_mcu();
 void f030_enable_pwm();
 void f030_disable_pwm();
 void f030_pwm_play(uint8_t data);
+void f030_set_expand(uint8_t value);
 bool f030_is_data_needed();
 
 #endif /*F030_H_*/
