@@ -36,7 +36,7 @@ SUOBJF := $(addprefix $(BUILD)/,$(SUOBJF))
 
 #Compile Flags
 CFLAGS  := -g -Wall -Wno-missing-braces -std=c99
-CFLAGS += -Os -funroll-loops -fomit-frame-pointer
+CFLAGS += -Os
 CFLAGS += -flto
 CFLAGS += -mthumb -mcpu=cortex-m0
 CFLAGS += -mfloat-abi=soft
