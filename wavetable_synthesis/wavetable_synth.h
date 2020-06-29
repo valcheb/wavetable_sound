@@ -2,33 +2,49 @@
 #define WAVETABLE_SYNTH_H_
 
 #include "stdbool.h"
-#include "math.h"
 #include "stdint.h"
 
-//ring buffer interface
-typedef struct ring
+#include "wavetable_dictionary.h"
+#include "song.h"
+
+typedef struct
 {
-    uint8_t *buffer;
-    uint8_t in;
-    uint8_t out;
-    uint16_t size;
-    uint16_t current_size;
-} ring_t;
+    uint16_t current_idx; //position in data song array
+    float    phase_increment;
+    uint32_t note_len;
+    float    current_phase;
+    uint16_t wave_len;
+    uint8_t  wavetable; //number of wavetable
+    uint8_t  volume;
+    uint8_t  smooth;
+    uint8_t  smooth_increment;
+    uint8_t  current_smooth;
+} channel_t;
 
-void ring_init(ring_t *rbuf, uint8_t *src_buf, uint16_t size);
-void ring_put(ring_t *rbuf, uint8_t data);
-uint8_t ring_pop(ring_t *rbuf);
-bool ring_is_full(ring_t *rbuf);
-bool ring_is_empty(ring_t *rbuf);
+typedef struct
+{
+    /*header*/
+    uint8_t   header_size;
+    uint8_t   bpm;
+    uint8_t   rate;
+    uint8_t   chan_number;
+    uint8_t   wave_number;
+    /*song info*/
+    uint8_t   current_chan;
+    uint16_t  data_sizes[CHANNEL_MAX];
+    uint16_t  channel_offsets[CHANNEL_MAX];
+    uint16_t  wave_sizes[WAVE_MAX];
+    uint16_t  wave_offsets[WAVE_MAX];
+    channel_t channels[CHANNEL_MAX];
+    /**/
+    uint32_t  song_len;
+} song_t;
 
-//synthesis interface
 void wts_init();
-bool wst_is_full();
-bool wst_is_empty();
-bool wst_is_continue();
+bool wts_is_full();
+bool wts_is_empty();
+bool wts_is_continue();
 uint8_t wts_get_value();
 void wts_cook_data();
-
-void debug_wst_reset_song();
 
 #endif /*WAVETABLE_SYNTH_H_*/

@@ -7,6 +7,7 @@
 void ma_init_mcu();
 void ma_pwm_play(uint8_t data);
 bool ma_is_data_needed();
-void ma_disable_mcu();
+void ma_enable_pwm();
+void ma_disable_pwm();
 
 #endif /*MCU_ADAPTER_H_*/

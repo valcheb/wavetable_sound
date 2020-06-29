@@ -1,5 +1,8 @@
 #include "f407.h"
 
+#define TIMER_PERIOD 10500/6 //48kHz PWM freq
+#define FREQ_EXPAND_COEF 1 //for raw dindon 8kHz
+
 void f407_msDelay(uint32_t ms)
 {
     volatile uint32_t i;
@@ -10,10 +13,9 @@ void f407_msDelay(uint32_t ms)
     for (i; i != 0; i--);
 }
 
-void f407_init_gpio()
+inline static void f407_init_gpio()
 {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 
     GPIO_InitTypeDef init;
     init.GPIO_Mode = GPIO_Mode_AF;
@@ -25,10 +27,10 @@ void f407_init_gpio()
     GPIO_PinAFConfig(GPIOD,GPIO_PinSource12,GPIO_AF_TIM4);
 }
 
-#define TIMER_PERIOD 10500/6 //48kHz PWM freq 1750
-#define FREQ_EXPAND_COEF 1*6 //test for raw dindon 8kHz
-void f407_init_pwm()
+inline static void f407_init_pwm()
 {
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+
     TIM_TimeBaseInitTypeDef base_timer;
     TIM_TimeBaseStructInit(&base_timer);
 
@@ -50,9 +52,6 @@ void f407_init_pwm()
     TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
 
     TIM_ARRPreloadConfig(TIM4,ENABLE);
-	TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
-    TIM_Cmd(TIM4,ENABLE);
-	NVIC_EnableIRQ(TIM4_IRQn);
 }
 
 void f407_init_mcu()
@@ -61,7 +60,14 @@ void f407_init_mcu()
     f407_init_pwm();
 }
 
-void f407_disable_mcu()
+void f407_enable_pwm()
+{
+    TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
+    TIM_Cmd(TIM4,ENABLE);
+	NVIC_EnableIRQ(TIM4_IRQn);
+}
+
+void f407_disable_pwm()
 {
     TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);
 	TIM_Cmd(TIM4,DISABLE);
