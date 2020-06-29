@@ -10,9 +10,9 @@
 typedef struct
 {
     uint16_t current_idx; //position in data song array
-    float    phase_increment;
+    uint32_t    phase_increment;
     uint32_t note_len;
-    float    current_phase;
+    uint32_t    current_phase;
     uint16_t wave_len;
     uint8_t  wavetable; //number of wavetable
     uint8_t  volume;

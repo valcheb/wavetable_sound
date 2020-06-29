@@ -3,6 +3,7 @@
 
 #include "stdint.h"
 
+#define ACCURACY           100
 #define CHANNEL_MAX        4
 #define WAVE_MAX           16
 
@@ -59,7 +60,7 @@ typedef enum
     NOTE_Dd
 } note_e;
 
-extern float note_freq[NOTE_FREQ_SIZE];
+extern uint32_t note_freq[NOTE_FREQ_SIZE];
 
 /*note duration*/
 #define DURATION_BASE 4*60 //seconds

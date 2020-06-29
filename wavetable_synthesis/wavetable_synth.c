@@ -1,5 +1,4 @@
 #include "wavetable_synth.h"
-#include "math.h"
 
 //ring buffer interface
 
@@ -66,7 +65,7 @@ inline static uint8_t wts_parse_value(uint16_t byte, uint16_t mask, uint8_t offs
     (
         (byte>>offset) & mask
     );
-}
+;}
 
 inline static bool wts_is_note_byte(uint16_t byte)
 {
@@ -77,16 +76,21 @@ inline static bool wts_is_note_byte(uint16_t byte)
 
 /*synth*/
 volatile static int a = 0;
-inline static uint8_t wts_linear_interpole(uint16_t *arr, float i)
+inline static uint8_t wts_linear_interpole(uint16_t *arr, uint32_t i)
 {
-    float f = (float)floor(i);
-    float c = (float)ceil(i);
-    uint8_t top = arr[(uint16_t)c];
-    uint8_t bottom = arr[(uint16_t)f];
+    uint32_t floor = i/100;
+    uint32_t ceil = floor+1;
+    int top = arr[ceil];
+    int bottom = arr[floor];
+
+    if (floor >= 252)
+    {
+        a++;
+    }
 
     return (uint8_t)
     (
-        (top - bottom) * (i - f) + bottom
+        (top - bottom) * (int)(i - floor*ACCURACY)/ACCURACY + bottom
     );
 }
 
@@ -100,9 +104,9 @@ inline static uint32_t wts_calculate_duration(uint8_t dur, uint8_t bpm, uint8_t 
     return (uint32_t)rate[rate_i]*KILO*DURATION_BASE/bpm/durations[dur]; //bmp and rate mb global static
 }
 
-inline static float wts_calculate_increment(uint8_t note, uint16_t wave_len, uint8_t rate_i)
+inline static uint32_t wts_calculate_increment(uint8_t note, uint16_t wave_len, uint8_t rate_i)
 {
-    return (float)wave_len*note_freq[note]/rate[rate_i]/KILO;
+    return (uint32_t)wave_len*note_freq[note]/rate[rate_i]/KILO;
 }
 
 inline static void wts_init_song(song_t *song_st, uint16_t *song)
@@ -200,13 +204,14 @@ inline static void wts_cook_channel(channel_t *channel)
     if (channel->note_len != 0)
     {
         uint8_t interpolated_value = wts_linear_interpole(&song[song_st.wave_offsets[channel->wavetable]],channel->current_phase);
-        uint8_t calculated_value = (uint8_t)floor(interpolated_value /** channels[num].current_smooth*/ * (double)channel->volume/255);
+        uint32_t vol = (channel->volume*ACCURACY/255);
+        uint8_t calculated_value = (uint8_t)((interpolated_value * vol)/ACCURACY); /* * channels[num].current_smooth*/
 
         ring_put(&data_ring,calculated_value);
 
         channel->current_phase += channel->phase_increment;
-        if (channel->current_phase >= channel->wave_len-1)
-            channel->current_phase -= (float)channel->wave_len;
+        if (channel->current_phase >= (channel->wave_len-1)*ACCURACY )
+            channel->current_phase -= (channel->wave_len-1)*ACCURACY;
         channel->note_len--;
     }
     else
