@@ -43,7 +43,7 @@ CFLAGS += -mfloat-abi=soft
 CFLAGS += -I$(CMSISD)/core -I$(CMSISD)/device $(addprefix -I, $(SOURCED))
 
 #Link Flags
-LDFLAGS := -Wl,-Map,$(BUILD)/$(TARGET).map -g -T$(LDSCRIPT) --specs=nosys.specs -lm
+LDFLAGS := -Wl,-Map,$(BUILD)/$(TARGET).map -g -T$(LDSCRIPT) --specs=nosys.specs
 
 #Headers of libraries
 SPLD := devices/stm32f030/library/STM32F0xx_StdPeriph_Lib_V1.5.0
