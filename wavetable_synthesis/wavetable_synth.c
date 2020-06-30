@@ -151,14 +151,14 @@ inline static void wts_init_song(song_t *song_st, uint16_t *song)
     song_st->song_len = 0;
     for (int i = 0; i < song_st->chan_number; i++)
     {
-        uint8_t current_offset = song_st->channel_offsets[i];
+        uint16_t current_offset = song_st->channel_offsets[i];
         uint16_t current_size = song_st->data_sizes[i];
-        while(current_size != 0) //TODO optimize increments like this: current_offset < song_st->channel_offsets[j] + song_st->data_sizes[j]
+
+        for (uint16_t i = current_offset; i < current_offset + current_size; i++)
         {
-            temp = song[current_offset++];
+            temp = song[i];
             if (wts_is_note_byte(temp))
                 song_st->song_len += wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),song_st->bpm,song_st->rate);
-            current_size--;
         }
     }
 }
