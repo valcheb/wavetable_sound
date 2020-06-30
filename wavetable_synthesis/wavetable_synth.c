@@ -93,14 +93,14 @@ inline static uint8_t wts_linear_interpole(uint16_t *arr, uint32_t i)
     //готовить, если есть ноты для готовки
 }*/
 
-inline static uint32_t wts_calculate_duration(uint8_t dur, uint8_t bpm, uint8_t rate_i)
+inline static uint32_t wts_calculate_duration(uint8_t dur, uint8_t bpm, uint8_t rate_i, uint8_t chan)
 {
-    return (uint32_t)rate[rate_i]*KILO*DURATION_BASE/bpm/durations[dur]; //bmp and rate mb global static
+    return (uint32_t)(rate[rate_i]*KILO/chan)*DURATION_BASE/bpm/durations[dur]; //bmp and rate mb global static
 }
 
-inline static uint32_t wts_calculate_increment(uint8_t note, uint16_t wave_len, uint8_t rate_i)
+inline static uint32_t wts_calculate_increment(uint8_t note, uint16_t wave_len, uint8_t rate_i, uint8_t chan)
 {
-    return (uint32_t)wave_len*note_freq[note]/rate[rate_i]/KILO;
+    return (uint32_t)wave_len*note_freq[note]/(rate[rate_i]*KILO/chan);
 }
 
 inline static void wts_init_song(song_t *song_st, uint16_t *song)
@@ -195,27 +195,24 @@ uint8_t wts_get_value()
 
 inline static void wts_cook_channel(channel_t *channel)
 {
-    if (channel->note_len != 0)
+    if ( channel->note_len != 0 )
     {
         uint8_t interpolated_value = wts_linear_interpole(&song[song_st.wave_offsets[channel->wavetable]],channel->current_phase);
         uint32_t vol = (channel->volume*ACCURACY/255);
         uint8_t calculated_value = (uint8_t)((interpolated_value * vol)/ACCURACY); /* * channels[num].current_smooth*/
-
         ring_put(&data_ring,calculated_value);
-
         channel->current_phase += channel->phase_increment;
         if (channel->current_phase >= (channel->wave_len-1)*ACCURACY )
             channel->current_phase -= (channel->wave_len-1)*ACCURACY;
         channel->note_len--;
     }
-    else
+    else if ( channel->current_idx < (channel->offset + channel->data_size) )
     {
         uint16_t temp = song[channel->current_idx];
-        //song_len_in_notes--;
         if (wts_is_note_byte(temp))
         {
-            channel->phase_increment = wts_calculate_increment(wts_parse_value(temp,NOTE_MASK,NOTE_OS),channel->wave_len,song_st.rate);
-            channel->note_len = wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),song_st.bpm,song_st.rate);
+            channel->phase_increment = wts_calculate_increment(wts_parse_value(temp,NOTE_MASK,NOTE_OS),channel->wave_len,song_st.rate, song_st.chan_number);
+            channel->note_len = wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),song_st.bpm,song_st.rate, song_st.chan_number);
             channel->current_phase = 0;
         }
         else
