@@ -118,17 +118,24 @@ inline static void wts_init_song(song_t *song_st, uint16_t *song)
     uint16_t temp_offset = 2;
     for (int i = 0; i < song_st->chan_number; i++)
     {
-        song_st->data_sizes[i] = song[temp_offset+i];
-    }
+        song_st->channels[i].note_len = 0;
+        song_st->channels[i].current_phase = 0;
+        song_st->channels[i].data_size = song[temp_offset+i];
 
-    song_st->channel_offsets[0] = temp_offset+song_st->chan_number;
-    for (int i = 1; i < song_st->chan_number; i++)
-    {
-        song_st->channel_offsets[i] = song_st->channel_offsets[0] + song_st->data_sizes[i-1];
+        if (i == 0)
+        {
+            song_st->channels[0].offset = temp_offset+song_st->chan_number;
+        }
+        else
+        {
+            song_st->channels[i].offset = song_st->channels[0].offset + song_st->channels[i-1].data_size;
+        }
+
+        song_st->channels[i].current_idx = song_st->channels[i].offset;
     }
 
     /**/
-    temp_offset = song_st->channel_offsets[song_st->chan_number-1] + song_st->data_sizes[song_st->chan_number-1];
+    temp_offset = song_st->channels[song_st->chan_number-1].offset + song_st->channels[song_st->chan_number-1].data_size;
     for (int i = 0; i < song_st->wave_number; i++)
     {
         song_st->wave_sizes[i] = song[temp_offset+i];
@@ -137,28 +144,21 @@ inline static void wts_init_song(song_t *song_st, uint16_t *song)
     song_st->wave_offsets[0] = temp_offset + song_st->wave_number;
     for (int i = 1; i < song_st->wave_number; i++)
     {
-        song_st->wave_offsets[i] = song_st->wave_offsets[0] + song_st->wave_sizes[i-1];
+        song_st->wave_offsets[i] = song_st->wave_offsets[i-1] + song_st->wave_sizes[i-1];
     }
 
     /**/
-    for (int i = 0; i < song_st->chan_number; i++)
-    {
-        song_st->channels[i].current_idx = song_st->channel_offsets[i];
-        song_st->channels[i].note_len = 0;
-        song_st->channels[i].current_phase = 0;
-    }
-
     song_st->song_len = 0;
     for (int i = 0; i < song_st->chan_number; i++)
     {
-        uint16_t current_offset = song_st->channel_offsets[i];
-        uint16_t current_size = song_st->data_sizes[i];
+        uint16_t current_offset = song_st->channels[i].offset;
+        uint16_t current_size = song_st->channels[i].data_size;
 
         for (uint16_t i = current_offset; i < current_offset + current_size; i++)
         {
             temp = song[i];
             if (wts_is_note_byte(temp))
-                song_st->song_len += wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),song_st->bpm,song_st->rate);
+                song_st->song_len += wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),song_st->bpm,song_st->rate, song_st->chan_number);
         }
     }
 }
