@@ -17,6 +17,7 @@ inline static void f407_init_gpio()
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);
 
     GPIO_InitTypeDef init;
+    GPIO_StructInit(&init);
     init.GPIO_Mode = GPIO_Mode_AF;
     init.GPIO_OType = GPIO_OType_PP;
     init.GPIO_Pin = GPIO_Pin_12;
