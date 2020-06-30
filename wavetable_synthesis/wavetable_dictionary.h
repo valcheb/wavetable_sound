@@ -54,10 +54,10 @@ typedef enum
     NOTE_A,
     NOTE_Ad,
     NOTE_B,
-    NOTE_C,
-    NOTE_Cd,
-    NOTE_D,
-    NOTE_Dd
+    NOTE_C = -4,
+    NOTE_Cd = -5,
+    NOTE_D = -6,
+    NOTE_Dd = -7
 } note_e;
 
 extern uint32_t note_freq[NOTE_FREQ_SIZE];
