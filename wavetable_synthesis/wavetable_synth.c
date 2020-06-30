@@ -93,9 +93,26 @@ inline static uint8_t wts_linear_interpole(uint16_t *arr, uint32_t i)
     //готовить, если есть ноты для готовки
 }*/
 
-inline static uint32_t wts_calculate_duration(uint8_t dur, uint8_t bpm, uint8_t rate_i, uint8_t chan)
+inline static uint32_t wts_calculate_duration(uint8_t dur, uint8_t dur_m, uint8_t bpm, uint8_t rate_i, uint8_t chan)
 {
-    return (uint32_t)(rate[rate_i]*KILO/chan)*DURATION_BASE/bpm/durations[dur]; //bmp and rate mb global static
+    uint32_t r = rate[rate_i]*KILO/chan;
+    uint32_t d = 0;
+    switch(dur_m)
+    {
+        case DURATION_SIMPLE:
+                              d = ACCURACY/durations[dur];
+                              break;
+        case DURATION_POINT:
+                              d = ACCURACY/durations[dur] + ACCURACY/(2*durations[dur]);
+                              break;
+        //case DURATION_TRIOLET: ; break;
+        default:
+                              break;
+    }
+    return (uint32_t)
+    (
+        r*DURATION_BASE/bpm*d/ACCURACY
+    );
 }
 
 inline static uint32_t wts_calculate_increment(uint8_t note, uint16_t wave_len, uint8_t rate_i, uint8_t chan)
@@ -128,7 +145,7 @@ inline static void wts_init_song(song_t *song_st, uint16_t *song)
         }
         else
         {
-            song_st->channels[i].offset = song_st->channels[0].offset + song_st->channels[i-1].data_size;
+            song_st->channels[i].offset = song_st->channels[0].offset + song_st->channels[i-1].data_size; // [i-1].offset+[i-1].datasize?
         }
 
         song_st->channels[i].current_idx = song_st->channels[i].offset;
@@ -158,7 +175,10 @@ inline static void wts_init_song(song_t *song_st, uint16_t *song)
         {
             temp = song[i];
             if (wts_is_note_byte(temp))
-                song_st->song_len += wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),song_st->bpm,song_st->rate, song_st->chan_number);
+                song_st->song_len += wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),
+                                                            wts_parse_value(temp,DURATION_P_MASK,DURATION_P_OS),
+                                                            song_st->bpm,song_st->rate,
+                                                            song_st->chan_number);
         }
     }
 }
@@ -212,7 +232,10 @@ inline static void wts_cook_channel(channel_t *channel)
         if (wts_is_note_byte(temp))
         {
             channel->phase_increment = wts_calculate_increment(wts_parse_value(temp,NOTE_MASK,NOTE_OS),channel->wave_len,song_st.rate, song_st.chan_number);
-            channel->note_len = wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),song_st.bpm,song_st.rate, song_st.chan_number);
+            channel->note_len = wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),
+                                                       wts_parse_value(temp,DURATION_P_MASK,DURATION_P_OS),
+                                                       song_st.bpm,song_st.rate,
+                                                       song_st.chan_number);
             channel->current_phase = 0;
         }
         else

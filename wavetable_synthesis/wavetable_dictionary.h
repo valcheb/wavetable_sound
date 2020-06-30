@@ -79,6 +79,13 @@ typedef enum
 
 extern uint8_t durations[];
 
+typedef enum
+{
+    DURATION_SIMPLE = 0,
+    DURATION_POINT,
+    DURATION_TRIOLET
+} duration_mode_e;
+
 /*rate*/
 typedef enum
 {
