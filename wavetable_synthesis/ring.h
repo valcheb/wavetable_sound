@@ -40,16 +40,12 @@ inline static uint8_t ring_pop(ring_t *rbuf)
 
 inline static bool ring_is_full(ring_t *rbuf)
 {
-    if (rbuf->current_size >= rbuf->size)
-        return true;
-    return false;
+    return rbuf->current_size >= rbuf->size;
 }
 
 inline static bool ring_is_empty(ring_t *rbuf)
 {
-    if (rbuf->current_size == 0)
-        return true;
-    return false;
+    return rbuf->current_size == 0;
 }
 
 #endif /*RING_H_*/

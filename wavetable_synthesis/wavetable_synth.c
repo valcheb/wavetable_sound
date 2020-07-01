@@ -18,9 +18,7 @@ inline static uint8_t wts_parse_value(uint16_t byte, uint16_t mask, uint8_t offs
 
 inline static bool wts_is_note_byte(uint16_t byte)
 {
-    if ( ((byte>>TYPE_OS) & TYPE_MASK) != 1 ) //MSB mask
-        return true;
-    return false;
+    return ((byte>>TYPE_OS) & TYPE_MASK) != 1;
 }
 
 /*synth*/
@@ -49,14 +47,14 @@ inline static uint32_t wts_calculate_duration(uint8_t dur, uint8_t dur_m, uint8_
     switch(dur_m)
     {
         case DURATION_SIMPLE:
-                              d = ACCURACY/durations[dur];
-                              break;
+            d = ACCURACY/durations[dur];
+            break;
         case DURATION_POINT:
-                              d = ACCURACY/durations[dur] + ACCURACY/(2*durations[dur]);
-                              break;
+            d = ACCURACY/durations[dur] + ACCURACY/(2*durations[dur]);
+            break;
         //case DURATION_TRIOLET: ; break;
         default:
-                              break;
+            break;
     }
     return (uint32_t)
     (
@@ -151,9 +149,7 @@ bool wts_is_empty()
 
 bool wts_is_continue()
 {
-    if (song_st.song_len > 0)
-        return true;
-    return false;
+    return song_st.song_len > 0;
 }
 
 uint8_t wts_get_value()
