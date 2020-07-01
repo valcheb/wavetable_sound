@@ -40,8 +40,7 @@
 
 typedef enum
 {
-    WAVE_1 = 0,
-    WAVE_2
+    WAVE_1 = 0
 } wave_e;
 
 extern uint8_t test_array1[];
