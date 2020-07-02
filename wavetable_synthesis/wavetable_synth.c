@@ -42,25 +42,15 @@ inline static uint8_t wts_linear_interpole(uint16_t *arr, uint32_t i)
 
 inline static uint32_t wts_calculate_duration(uint8_t dur, uint8_t dur_m, uint8_t bpm, uint8_t rate_i, uint8_t chan)
 {
-    uint32_t r = rate[rate_i]*KILO/chan;
-    uint64_t d = 0;
-    uint32_t acc = 10000000;
+    uint32_t d = rate[rate_i]*KILO/chan*DURATION_BASE/bpm/durations[dur];
     switch(dur_m)
     {
-        case DURATION_SIMPLE:
-            d = acc/durations[dur];
-            break;
-        case DURATION_POINT:
-            d = acc/durations[dur] + acc/(2*durations[dur]);
-            break;
-        //case DURATION_TRIOLET: ; break;
         default:
-            break;
+        case DURATION_SIMPLE:
+            return d;
+        case DURATION_POINT:
+            return 3*d/2;
     }
-    return (uint32_t)
-    (
-        r*DURATION_BASE/bpm*d/acc
-    );
 }
 
 inline static uint32_t wts_calculate_increment(uint8_t note, uint16_t wave_len, uint8_t rate_i, uint8_t chan)
