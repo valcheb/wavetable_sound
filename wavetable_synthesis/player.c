@@ -27,6 +27,7 @@ void pl_start_play()
 
 void pl_stop_play()
 {
+    ma_pwm_play(0x00);
     ma_disable_pwm();
 }
 
