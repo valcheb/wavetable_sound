@@ -149,38 +149,69 @@ uint8_t wts_get_value()
     return ring_pop(&data_ring);
 }
 
+inline static uint8_t wts_synth(uint16_t *wave, uint32_t phase, uint32_t volume, uint32_t smooth)
+{
+    uint8_t interpolated_value = wts_linear_interpole(wave, phase);
+    uint32_t vol = volume * 1000 / 255; //TODO improve volume calculation
+    return (uint8_t)
+    (
+        interpolated_value * vol / 1000 // * smooth
+    );
+}
+
+inline static void wts_prepare_note(channel_t *channel, uint16_t note_byte, song_t *song)
+{
+    channel->phase_increment = wts_calculate_increment(wts_parse_value(note_byte,NOTE_MASK,NOTE_OS),
+                                                       channel->wave_len,
+                                                       song->rate,
+                                                       song->chan_number);
+    channel->note_len = wts_calculate_duration(wts_parse_value(note_byte,DURATION_MASK,DURATION_OS),
+                                               wts_parse_value(note_byte,DURATION_P_MASK,DURATION_P_OS),
+                                               song->bpm,
+                                               song->rate,
+                                               song->chan_number);
+    channel->current_phase = 0;
+}
+
+inline static void wts_prepare_channel(channel_t *channel, uint16_t channel_byte, song_t *song)
+{
+    channel->wavetable = wts_parse_value(channel_byte,WAVE_MASK,WAVE_OS);
+    channel->wave_len = song->wave_sizes[channel->wavetable];
+    channel->volume = wts_parse_value(channel_byte,VOLUME_MASK,VOLUME_OS);
+    channel->smooth = wts_parse_value(channel_byte,SMOOTH_MASK,SMOOTH_OS);
+    channel->current_smooth = 0;
+}
+
 inline static void wts_cook_channel(channel_t *channel)
 {
     if ( channel->note_len != 0 )
     {
-        uint8_t interpolated_value = wts_linear_interpole(&song[song_st.wave_offsets[channel->wavetable]],channel->current_phase);
-        uint32_t vol = (channel->volume*ACCURACY/255);
-        uint8_t calculated_value = (uint8_t)((interpolated_value * vol)/ACCURACY); /* * channels[num].current_smooth*/
-        ring_put(&data_ring,calculated_value);
+        uint8_t synth_value = wts_synth(&song[song_st.wave_offsets[channel->wavetable]],
+                                        channel->current_phase,
+                                        channel->volume,
+                                        channel->current_smooth);
+
+        ring_put(&data_ring,synth_value);
+
         channel->current_phase += channel->phase_increment;
-        if (channel->current_phase >= (channel->wave_len-1)*ACCURACY )
+        if (channel->current_phase >= (channel->wave_len-1)*ACCURACY)
             channel->current_phase -= (channel->wave_len-1)*ACCURACY;
+
         channel->note_len--;
     }
     else if ( channel->current_idx < (channel->offset + channel->data_size) )
     {
         uint16_t temp = song[channel->current_idx];
+
         if (wts_is_note_byte(temp))
         {
-            channel->phase_increment = wts_calculate_increment(wts_parse_value(temp,NOTE_MASK,NOTE_OS),channel->wave_len,song_st.rate, song_st.chan_number);
-            channel->note_len = wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),
-                                                       wts_parse_value(temp,DURATION_P_MASK,DURATION_P_OS),
-                                                       song_st.bpm,song_st.rate,
-                                                       song_st.chan_number);
-            channel->current_phase = 0;
+            wts_prepare_note(channel, temp, &song_st);
         }
         else
         {
-            channel->wavetable = wts_parse_value(temp,WAVE_MASK,WAVE_OS);
-            channel->wave_len = song_st.wave_sizes[channel->wavetable];
-            channel->volume = wts_parse_value(temp,VOLUME_MASK,VOLUME_OS);
-            channel->smooth = wts_parse_value(temp,SMOOTH_MASK,SMOOTH_OS);
+            wts_prepare_channel(channel, temp, &song_st);
         }
+
         channel->current_idx++;
     }
 }
