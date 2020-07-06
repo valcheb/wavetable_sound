@@ -109,6 +109,14 @@ typedef enum
 /*smooth*/
 typedef enum
 {
+    WAVE_1 = 0,
+    WAVE_2,
+    WAVE_3,
+    WAVE_4,
+} wave_e;
+
+typedef enum
+{
     SMOOTH_0 = 0,
     SMOOTH_1,
     SMOOTH_2,
