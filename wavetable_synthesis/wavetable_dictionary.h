@@ -6,6 +6,7 @@
 #define ACCURACY           100
 #define CHANNEL_MAX        4
 #define WAVE_MAX           16
+#define SMOOTH_MAX         8
 
 /*offsets*/
 /*header*/
