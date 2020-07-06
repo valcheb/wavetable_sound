@@ -152,7 +152,7 @@ uint8_t wts_get_value()
 inline static uint8_t wts_synth(uint16_t *wave, uint32_t phase, uint32_t volume, uint32_t smooth)
 {
     uint8_t interpolated_value = wts_linear_interpole(wave, phase);
-    uint32_t vol = volume * 1000 / 255; //TODO improve volume calculation
+    uint32_t vol = volume * 1000 / 256; //TODO improve volume calculation
     return (uint8_t)
     (
         interpolated_value * vol / 1000 // * smooth
