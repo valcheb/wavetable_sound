@@ -36,15 +36,17 @@ typedef struct
     uint8_t   rate;
     uint8_t   chan_number;
     uint8_t   wave_number;
+    uint8_t   smooth_number;
     /*song info*/
+    uint32_t  song_len;
     uint8_t   current_chan;
-    //uint16_t  data_sizes[CHANNEL_MAX];
-    //uint16_t  channel_offsets[CHANNEL_MAX];
+    channel_t channels[CHANNEL_MAX];
+    /*wave*/
     uint16_t  wave_sizes[WAVE_MAX];
     uint16_t  wave_offsets[WAVE_MAX];
-    channel_t channels[CHANNEL_MAX];
-    /**/
-    uint32_t  song_len;
+    /*smooth*/
+    uint16_t  smooth_sizes[SMOOTH_MAX];
+    uint16_t  smooth_offsets[SMOOTH_MAX];
 } song_t;
 
 void wts_init();
