@@ -96,7 +96,6 @@ typedef enum
 } rate_e;
 
 extern uint8_t rate[];
-//static uint8_t period[] = {}; //как получить значения периода для таймера ШИМ по параметру rate?
 
 typedef enum
 {
@@ -126,10 +125,5 @@ typedef enum
     SMOOTH_6,
     SMOOTH_7
 } smooth_e;
-
-/*TODO draw smooth funcs
-static uint8_t smooth0-7[] = {};
-static uint8_t *smooth_array[] = {smooth0, ...};
-*/
 
 #endif /*WAVETABLE_DICTIONARY_H*/
