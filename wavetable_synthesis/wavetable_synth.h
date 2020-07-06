@@ -17,7 +17,7 @@ typedef struct
     uint8_t  current_smooth;
     uint8_t  smooth_counter;
     uint8_t  smooth_num;
-    uint32_t smooth_len;
+    uint32_t smooth_step;
     /*wave*/
     uint16_t wave_len;
     uint8_t  wave_num;
