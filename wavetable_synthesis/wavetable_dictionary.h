@@ -14,6 +14,7 @@
 #define BPM_OS             0
 #define RATE_OS            10
 #define CHAN_N_OS          8
+#define SMOOTH_N_OS        4
 #define WAVE_N_OS          0
 /*note*/
 #define TYPE_OS            15
@@ -30,7 +31,8 @@
 #define BPM_MASK             0x00ff
 #define RATE_MASK            0x003f
 #define CHAN_N_MASK          0x0003
-#define WAVE_N_MASK          0x00ff
+#define SMOOTH_N_MASK        0x000f
+#define WAVE_N_MASK          0x000f
 /*note*/
 #define TYPE_MASK            0x0001
 #define NOTE_MASK            0x00ff
