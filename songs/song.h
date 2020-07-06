@@ -1,21 +1,8 @@
 #include "wavetable_dictionary.h"
 #include "stdint.h"
 
-/*typedef enum
-    {
-        WAVE_SQUARE = 0,
-        WAVE_TRIANGLE,
-        WAVE_SIN,
-    } wave_e;
-
-    static uint8_t square[] = {};
-    static uint8_t triangle[] = {};
-    static uint8_t sin[] = {};
-
-    static uint8_t* wavetable[] = {square, triangle, sin};
-*/
 #define NOTE_ID(note,octave) ((note) + 12*(octave))
-#define SHIFT_LEFT(x,y) ((x)<<(y))
+#define SHIFT_LEFT(x,y)      ((x)<<(y))
 
 /*header*/
 #define HEADER_SIZE_S(x)   SHIFT_LEFT(x,HEADER_SIZE_OS)
@@ -38,12 +25,4 @@
 #define HEADER(bpm, rate_, chan_n, wave)   HEADER_SIZE_S(2+(chan_n)) + BPM_S(bpm), RATE_S(rate_) + CHAN_N_S((chan_n)-1) + WAVE_N_S(wave)
 #define DATA_SIZE(x)                       (sizeof(x)/sizeof((x)[0]))
 
-typedef enum
-{
-    WAVE_1 = 0
-} wave_e;
-
-extern uint8_t test_array1[];
-/*extern uint8_t test_array2[];*/
-extern uint8_t *wavetables[];
 extern uint16_t song[];
