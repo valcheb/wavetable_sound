@@ -14,8 +14,8 @@ typedef struct
     uint32_t phase_increment;
     uint32_t note_len;
     /*smooth*/
-    uint8_t  current_smooth;
-    uint8_t  smooth_counter;
+    uint32_t current_smooth;
+    uint32_t smooth_counter;
     uint8_t  smooth_num;
     uint32_t smooth_step;
     /*wave*/
