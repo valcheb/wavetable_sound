@@ -79,18 +79,18 @@ inline static void wts_init_song(song_t *song_st, uint16_t *song)
 
         if (i == 0)
         {
-            song_st->channels[0].offset = temp_offset+song_st->chan_number;
+            song_st->channels[0].data_offset = temp_offset+song_st->chan_number;
         }
         else
         {
-            song_st->channels[i].offset = song_st->channels[0].offset + song_st->channels[i-1].data_size; // [i-1].offset+[i-1].datasize?
+            song_st->channels[i].data_offset = song_st->channels[0].data_offset + song_st->channels[i-1].data_size; // [i-1].offset+[i-1].datasize?
         }
 
-        song_st->channels[i].current_idx = song_st->channels[i].offset;
+        song_st->channels[i].data_idx = song_st->channels[i].data_offset;
     }
 
     /**/
-    temp_offset = song_st->channels[song_st->chan_number-1].offset + song_st->channels[song_st->chan_number-1].data_size;
+    temp_offset = song_st->channels[song_st->chan_number-1].data_offset + song_st->channels[song_st->chan_number-1].data_size;
     for (int i = 0; i < song_st->wave_number; i++)
     {
         song_st->wave_sizes[i] = song[temp_offset+i];
@@ -106,7 +106,7 @@ inline static void wts_init_song(song_t *song_st, uint16_t *song)
     song_st->song_len = 0;
     for (int i = 0; i < song_st->chan_number; i++)
     {
-        uint16_t current_offset = song_st->channels[i].offset;
+        uint16_t current_offset = song_st->channels[i].data_offset;
         uint16_t current_size = song_st->channels[i].data_size;
 
         for (uint16_t i = current_offset; i < current_offset + current_size; i++)
@@ -175,10 +175,10 @@ inline static void wts_prepare_note(channel_t *channel, uint16_t note_byte, song
 
 inline static void wts_prepare_channel(channel_t *channel, uint16_t channel_byte, song_t *song)
 {
-    channel->wavetable = wts_parse_value(channel_byte,WAVE_MASK,WAVE_OS);
-    channel->wave_len = song->wave_sizes[channel->wavetable];
+    channel->wave_num = wts_parse_value(channel_byte,WAVE_MASK,WAVE_OS);
+    channel->wave_len = song->wave_sizes[channel->wave_num];
     channel->volume = wts_parse_value(channel_byte,VOLUME_MASK,VOLUME_OS);
-    channel->smooth = wts_parse_value(channel_byte,SMOOTH_MASK,SMOOTH_OS);
+    channel->smooth_num = wts_parse_value(channel_byte,SMOOTH_MASK,SMOOTH_OS);
     channel->current_smooth = 0;
 }
 
@@ -186,7 +186,7 @@ inline static void wts_cook_channel(channel_t *channel)
 {
     if ( channel->note_len != 0 )
     {
-        uint8_t synth_value = wts_synth(&song[song_st.wave_offsets[channel->wavetable]],
+        uint8_t synth_value = wts_synth(&song[song_st.wave_offsets[channel->wave_num]],
                                         channel->current_phase,
                                         channel->volume,
                                         channel->current_smooth);
@@ -199,9 +199,9 @@ inline static void wts_cook_channel(channel_t *channel)
 
         channel->note_len--;
     }
-    else if ( channel->current_idx < (channel->offset + channel->data_size) )
+    else if ( channel->data_idx < (channel->data_offset + channel->data_size) )
     {
-        uint16_t temp = song[channel->current_idx];
+        uint16_t temp = song[channel->data_idx];
 
         if (wts_is_note_byte(temp))
         {
@@ -212,7 +212,7 @@ inline static void wts_cook_channel(channel_t *channel)
             wts_prepare_channel(channel, temp, &song_st);
         }
 
-        channel->current_idx++;
+        channel->data_idx++;
     }
 }
 

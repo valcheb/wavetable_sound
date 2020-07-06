@@ -9,18 +9,23 @@
 
 typedef struct
 {
-    uint16_t current_idx; //position in data song array
+    /*note*/
+    uint32_t current_phase;
     uint32_t phase_increment;
     uint32_t note_len;
-    uint32_t current_phase;
-    uint16_t wave_len;
-    uint8_t  wavetable; //number of wavetable
-    uint8_t  volume;
-    uint8_t  smooth;
-    uint8_t  smooth_increment;
+    /*smooth*/
     uint8_t  current_smooth;
+    uint8_t  smooth_counter;
+    uint8_t  smooth_num;
+    uint32_t smooth_len;
+    /*wave*/
+    uint16_t wave_len;
+    uint8_t  wave_num;
+    /*data*/
+    uint8_t  volume;
+    uint16_t data_idx;
     uint16_t data_size;
-    uint16_t offset;
+    uint16_t data_offset;
 } channel_t;
 
 typedef struct
