@@ -198,6 +198,23 @@ inline static void wts_prepare_channel(channel_t *channel, uint16_t channel_byte
     channel->smooth.number = wts_parse_value(channel_byte,SMOOTH_MASK,SMOOTH_OS);
 }
 
+inline static void wts_note_phase_routine(note_t *note, uint32_t limit)
+{
+    note->phase += note->phase_increment;
+    if (note->phase >= limit)
+        note->phase -= limit;
+}
+
+inline static void wts_smooth_phase_routine(smooth_t *smooth)
+{
+    smooth->counter++;
+    if (smooth->counter > smooth->step)
+    {
+        smooth->phase++;
+        smooth->counter = 0;
+    }
+}
+
 inline static void wts_cook_channel(channel_t *channel)
 {
     if ( channel->note.length != 0 )
@@ -210,17 +227,8 @@ inline static void wts_cook_channel(channel_t *channel)
 
         ring_put(&data_ring,synth_value);
 
-        channel->smooth.counter++;
-        if (channel->smooth.counter > channel->smooth.step)
-        {
-            channel->smooth.phase++;
-            channel->smooth.counter = 0;
-        }
-
-        channel->note.phase += channel->note.phase_increment;
-        if (channel->note.phase >= (channel->wave.length-1)*ACCURACY)
-            channel->note.phase -= (channel->wave.length-1)*ACCURACY;
-
+        wts_smooth_phase_routine(&channel->smooth);
+        wts_note_phase_routine(&channel->note,(channel->wave.length-1)*ACCURACY);
         channel->note.length--;
     }
     else if ( channel->data.index < (channel->data.offset + channel->data.size) )
