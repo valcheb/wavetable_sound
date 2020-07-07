@@ -7,25 +7,41 @@
 #include "wavetable_dictionary.h"
 #include "song.h"
 
+typedef struct //TODO continue this
+{
+    uint32_t phase;
+    uint32_t phase_increment;
+    uint32_t length;
+} note_t;
+
 typedef struct
 {
-    /*note*/
-    uint32_t current_phase;
-    uint32_t phase_increment;
-    uint32_t note_len;
-    /*smooth*/
-    uint32_t current_smooth;
-    uint32_t smooth_counter;
-    uint8_t  smooth_num;
-    uint32_t smooth_step;
-    /*wave*/
-    uint16_t wave_len;
-    uint8_t  wave_num;
-    /*data*/
-    uint8_t  volume;
-    uint16_t data_idx;
-    uint16_t data_size;
-    uint16_t data_offset;
+    uint32_t phase;
+    uint32_t counter;
+    uint32_t step;
+    uint8_t  number;
+} smooth_t;
+
+typedef struct
+{
+    uint16_t length;
+    uint8_t  number;
+} wave_t;
+
+typedef struct
+{
+    uint16_t index;
+    uint16_t size;
+    uint16_t offset;
+} note_data_t;
+
+typedef struct
+{
+    note_t      note;
+    smooth_t    smooth;
+    wave_t      wave;
+    note_data_t data;
+    uint8_t     volume;
 } channel_t;
 
 typedef struct
