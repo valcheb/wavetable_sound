@@ -7,7 +7,7 @@
 #include "wavetable_dictionary.h"
 #include "song.h"
 
-typedef struct //TODO continue this
+typedef struct
 {
     uint32_t phase;
     uint32_t phase_increment;

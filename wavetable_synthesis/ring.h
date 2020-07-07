@@ -5,9 +5,9 @@
 
 typedef struct ring
 {
-    uint8_t *buffer;
-    uint8_t in;
-    uint8_t out;
+    uint8_t  *buffer;
+    uint8_t  in;
+    uint8_t  out;
     uint16_t size;
     uint16_t current_size;
 } ring_t;

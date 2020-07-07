@@ -1,20 +1,18 @@
 #include "f407.h"
 
-#define TIMER_PERIOD 10500/6 //48kHz PWM freq
+#define TIMER_PERIOD 1750 //48kHz PWM freq
 
 void f407_msDelay(uint32_t ms)
 {
     volatile uint32_t i;
     RCC_ClocksTypeDef rcc;
-
     RCC_GetClocksFreq(&rcc);
-    i = (rcc.HCLK_Frequency/10/1000)*ms;
-    for (i; i != 0; i--);
+    for (int i = rcc.HCLK_Frequency / 10 / 1000 * ms; i != 0; i--);
 }
 
 inline static void f407_init_gpio()
 {
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
     GPIO_InitTypeDef init;
     GPIO_StructInit(&init);
@@ -22,9 +20,9 @@ inline static void f407_init_gpio()
     init.GPIO_OType = GPIO_OType_PP;
     init.GPIO_Pin = GPIO_Pin_12;
     init.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_Init(GPIOD,&init);
+    GPIO_Init(GPIOD, &init);
 
-    GPIO_PinAFConfig(GPIOD,GPIO_PinSource12,GPIO_AF_TIM4);
+    GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
 }
 
 inline static void f407_init_pwm()
@@ -48,10 +46,10 @@ inline static void f407_init_pwm()
     oc_init.TIM_Pulse = 0;
     oc_init.TIM_OCPolarity = TIM_OCPolarity_High;
 
-    TIM_OC1Init(TIM4,&oc_init);
+    TIM_OC1Init(TIM4, &oc_init);
     TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
 
-    TIM_ARRPreloadConfig(TIM4,ENABLE);
+    TIM_ARRPreloadConfig(TIM4, ENABLE);
 }
 
 void f407_init_mcu()
@@ -63,14 +61,14 @@ void f407_init_mcu()
 void f407_enable_pwm()
 {
     TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
-    TIM_Cmd(TIM4,ENABLE);
+    TIM_Cmd(TIM4, ENABLE);
 	NVIC_EnableIRQ(TIM4_IRQn);
 }
 
 void f407_disable_pwm()
 {
     TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);
-	TIM_Cmd(TIM4,DISABLE);
+	TIM_Cmd(TIM4, DISABLE);
 	NVIC_DisableIRQ(TIM4_IRQn);
 }
 
@@ -79,7 +77,7 @@ volatile static bool need_data = true;
 
 inline static void f407_send_to_pwm(uint8_t data)
 {
-    TIM4->CCR1 = data*TIMER_PERIOD/UINT8_MAX;
+    TIM4->CCR1 = data * TIMER_PERIOD / UINT8_MAX;
 }
 
 void f407_pwm_play(uint8_t data)
@@ -98,5 +96,5 @@ void TIM4_IRQHandler()
     need_data = true;
 
     TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
-    while (TIM_GetITStatus(TIM4,TIM_IT_Update) == SET) {__NOP;}
+    while (TIM_GetITStatus(TIM4, TIM_IT_Update) == SET) {__NOP;}
 }

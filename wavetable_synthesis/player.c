@@ -1,5 +1,4 @@
 #include "player.h"
-
 #include "wavetable_synth.h"
 
 void pl_init()
@@ -21,9 +20,9 @@ void pl_stop_play()
 
 void pl_play_song() //TODO rewrite with argument but reduce global variables
 {
-    if (!wts_is_full()) //is_cook_continue && !is_full
+    if (!wts_is_full())
     {
-        wts_cook_data();  //буфер заполняется COOK_SIZE лишних раз. на воспроизведение raw не влияет
+        wts_cook_data();
     }
 
     if (ma_is_data_needed() && !wts_is_empty())

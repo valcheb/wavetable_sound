@@ -14,5 +14,5 @@ uint32_t note_freq[NOTE_FREQ_SIZE] =
     //pause:
     0
 };
-uint8_t durations[] = {1,2,4,8,16,32,64};
+uint8_t durations[] = {1, 2, 4, 8, 16, 32, 64};
 uint8_t rate[] = {8, 16, 48};

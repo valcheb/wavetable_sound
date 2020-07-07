@@ -45,7 +45,7 @@
 
 /*note freq*/
 #define NOTE_FREQ_SIZE 98
-#define NOTE_PAUSE 97
+#define NOTE_PAUSE     97
 
 typedef enum
 {
@@ -99,6 +99,7 @@ typedef enum
 
 extern uint8_t rate[];
 
+/*channels*/
 typedef enum
 {
     CHAN_NUM_1 = 0,
