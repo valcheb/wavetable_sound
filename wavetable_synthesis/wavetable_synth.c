@@ -67,6 +67,26 @@ inline static void wts_fill_offsets(uint16_t *dest, uint16_t *sizes, uint8_t cou
     }
 }
 
+inline static void wts_calculate_song_len(song_t *song_st, uint16_t *song)
+{
+    song_st->song_len = 0;
+    for (int i = 0; i < song_st->chan_number; i++)
+    {
+        uint16_t current_offset = song_st->channels[i].data_offset;
+        uint16_t current_size = song_st->channels[i].data_size;
+
+        for (uint16_t i = current_offset; i < current_offset + current_size; i++)
+        {
+            uint16_t temp = song[i];
+            if (wts_is_note_byte(temp))
+                song_st->song_len += wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),
+                                                            wts_parse_value(temp,DURATION_P_MASK,DURATION_P_OS),
+                                                            song_st->bpm,song_st->rate,
+                                                            song_st->chan_number);
+        }
+    }
+}
+
 inline static void wts_init_song(song_t *song_st, uint16_t *song)
 {
     /*header*/
