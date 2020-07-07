@@ -1,3 +1,5 @@
+#include "string.h"
+
 #include "wavetable_synth.h"
 #include "ring.h"
 
@@ -122,47 +124,16 @@ inline static void wts_init_song(song_t *song_st, uint16_t *song)
 
     /*wave_offsets*/
     temp_offset = song_st->channels[song_st->chan_number-1].data_offset + song_st->channels[song_st->chan_number-1].data_size;
-    for (int i = 0; i < song_st->wave_number; i++)
-    {
-        song_st->wave_sizes[i] = song[temp_offset+i];
-    }
-
-    song_st->wave_offsets[0] = temp_offset + song_st->wave_number;
-    for (int i = 1; i < song_st->wave_number; i++)
-    {
-        song_st->wave_offsets[i] = song_st->wave_offsets[i-1] + song_st->wave_sizes[i-1];
-    }
+    memcpy(song_st->wave_sizes,song+temp_offset,song_st->wave_number*sizeof(song_st->wave_sizes[0]));
+    wts_fill_offsets(song_st->wave_offsets, song_st->wave_sizes, song_st->wave_number, temp_offset);
 
     /*smooth_offsets*/
     temp_offset = song_st->wave_offsets[song_st->wave_number-1] + song_st->wave_sizes[song_st->wave_number-1];
-    for (int i = 0; i < song_st->smooth_number; i++)
-    {
-        song_st->smooth_sizes[i] = song[temp_offset+i];
-    }
-
-    song_st->smooth_offsets[0] = temp_offset + song_st->smooth_number;
-    for (int i = 1; i < song_st->smooth_number; i++)
-    {
-        song_st->smooth_offsets[i] = song_st->smooth_offsets[i-1] + song_st->smooth_sizes[i-1];
-    }
+    memcpy(song_st->smooth_sizes,song+temp_offset,song_st->smooth_number*sizeof(song_st->smooth_sizes[0]));
+    wts_fill_offsets(song_st->smooth_offsets,song_st->smooth_sizes,song_st->smooth_number,temp_offset);
 
     /*song_len*/
-    song_st->song_len = 0;
-    for (int i = 0; i < song_st->chan_number; i++)
-    {
-        uint16_t current_offset = song_st->channels[i].data_offset;
-        uint16_t current_size = song_st->channels[i].data_size;
-
-        for (uint16_t i = current_offset; i < current_offset + current_size; i++)
-        {
-            temp = song[i];
-            if (wts_is_note_byte(temp))
-                song_st->song_len += wts_calculate_duration(wts_parse_value(temp,DURATION_MASK,DURATION_OS),
-                                                            wts_parse_value(temp,DURATION_P_MASK,DURATION_P_OS),
-                                                            song_st->bpm,song_st->rate,
-                                                            song_st->chan_number);
-        }
-    }
+    wts_calculate_song_len(song_st,song);
 }
 
 /*service*/
