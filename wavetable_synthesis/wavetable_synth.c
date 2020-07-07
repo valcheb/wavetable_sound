@@ -58,6 +58,15 @@ inline static uint32_t wts_calculate_increment(uint8_t note, uint16_t wave_len, 
     return (uint32_t)wave_len*note_freq[note]/(rate[rate_i]*KILO/chan);
 }
 
+inline static void wts_fill_offsets(uint16_t *dest, uint16_t *sizes, uint8_t count, uint32_t start_offset)
+{
+    dest[0] = start_offset + count;
+    for (int i = 1; i < count; i++)
+    {
+        dest[i] = dest[i-1] + sizes[i-1];
+    }
+}
+
 inline static void wts_init_song(song_t *song_st, uint16_t *song)
 {
     /*header*/
