@@ -6,7 +6,6 @@ void pl_init()
 {
     ma_init_mcu();
     wts_init();
-    ma_set_expand(1); //TODO delete func
 }
 
 void pl_start_play()

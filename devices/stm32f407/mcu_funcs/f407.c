@@ -75,9 +75,7 @@ void f407_disable_pwm()
 }
 
 /*pwm_player*/
-volatile static uint8_t tim_i = 0;
 volatile static bool need_data = true;
-static uint8_t freq_expand = 0;
 
 inline static void f407_send_to_pwm(uint8_t data)
 {
@@ -90,11 +88,6 @@ void f407_pwm_play(uint8_t data)
     f407_send_to_pwm(data);
 }
 
-void f407_set_expand(uint8_t value)
-{
-    freq_expand = value;
-}
-
 bool f407_is_data_needed()
 {
     return need_data;
@@ -102,12 +95,7 @@ bool f407_is_data_needed()
 
 void TIM4_IRQHandler()
 {
-    tim_i++;
-    if (tim_i == freq_expand)
-    {
-        tim_i = 0;
-        need_data = true;
-    }
+    need_data = true;
 
     TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
     while (TIM_GetITStatus(TIM4,TIM_IT_Update) == SET) {__NOP;}
