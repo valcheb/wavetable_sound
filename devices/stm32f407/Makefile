@@ -46,7 +46,7 @@ CFLAGS += -I$(CMSISD)/core -I$(CMSISD)/device $(addprefix -I, $(SOURCED))
 LDFLAGS := -Wl,-Map,$(BUILD)/$(TARGET).map -g -T$(LDSCRIPT) --specs=nano.specs --specs=nosys.specs
 
 #Headers of libraries
-SPLD := devices/stm32f407/library/STM32F4xx_StdPeriph_Driver
+SPLD := devices/stm32f407/library/SPL
 CFLAGS += -I$(SPLD)/inc
 #used lib source
 OBJF += $(BUILD)/stm32f4xx_rcc.o $(BUILD)/stm32f4xx_tim.o $(BUILD)/stm32f4xx_gpio.o
