@@ -3,7 +3,7 @@
 
 #include "mcu_adapter.h"
 
-void pl_init();
+void pl_init(uint16_t *song);
 void pl_play_song();
 void pl_start_play();
 void pl_stop_play();

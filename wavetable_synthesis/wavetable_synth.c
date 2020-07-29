@@ -84,6 +84,7 @@ inline static void wts_calculate_song_len(song_t *song_st, uint16_t *song)
 
 inline static void wts_init_song(song_t *song_st, uint16_t *song)
 {
+    song_st->song = song;
     /*header*/
     uint16_t temp = song[0];
     song_st->header_size = wts_parse_value(temp, HEADER_SIZE_MASK, HEADER_SIZE_OS);
@@ -187,9 +188,9 @@ inline static void wts_cook_channel(channel_t *channel)
 {
     if (channel->note.length != 0)
     {
-        uint8_t synth_value = wts_synth(&song[song_st.wave_offsets[channel->wave.number]],
+        uint8_t synth_value = wts_synth(song_st.song[song_st.wave_offsets[channel->wave.number]],
                                         channel->note.phase,
-                                        &song[song_st.smooth_offsets[channel->smooth.number]],
+                                        song_st.song[song_st.smooth_offsets[channel->smooth.number]],
                                         channel->smooth.phase,
                                         channel->volume);
 
@@ -201,7 +202,7 @@ inline static void wts_cook_channel(channel_t *channel)
     }
     else if (channel->data.index < (channel->data.offset + channel->data.size))
     {
-        uint16_t temp = song[channel->data.index];
+        uint16_t temp = song_st.song[channel->data.index];
 
         if (wts_is_note_byte(temp))
         {
@@ -216,7 +217,7 @@ inline static void wts_cook_channel(channel_t *channel)
     }
 }
 
-void wts_init()
+void wts_init(uint16_t *song)
 {
     ring_init(&data_ring, cooked_data, COOK_SIZE);
     wts_init_song(&song_st, song);

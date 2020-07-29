@@ -1,10 +1,9 @@
 #include "player.h"
 #include "wavetable_synth.h"
 
-void pl_init()
+void pl_init(uint16_t *song)
 {
-    ma_init_mcu();
-    wts_init();
+    wts_init(song);
 }
 
 void pl_start_play()

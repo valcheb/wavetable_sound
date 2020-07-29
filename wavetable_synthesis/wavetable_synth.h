@@ -5,7 +5,7 @@
 #include "stdint.h"
 
 #include "wavetable_dictionary.h"
-#include "song.h"
+//#include "song.h"
 
 typedef struct
 {
@@ -57,6 +57,7 @@ typedef struct
     uint32_t  song_len;
     uint8_t   current_chan;
     channel_t channels[CHANNEL_MAX];
+    uint16_t *song;
     /*wave*/
     uint16_t  wave_sizes[WAVE_MAX];
     uint16_t  wave_offsets[WAVE_MAX];
@@ -65,7 +66,7 @@ typedef struct
     uint16_t  smooth_offsets[SMOOTH_MAX];
 } song_t;
 
-void wts_init();
+void wts_init(uint16_t *song);
 bool wts_is_full();
 bool wts_is_empty();
 bool wts_is_continue();
