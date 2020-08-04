@@ -188,9 +188,9 @@ inline static void wts_cook_channel(channel_t *channel)
 {
     if (channel->note.length != 0)
     {
-        uint8_t synth_value = wts_synth(song_st.song[song_st.wave_offsets[channel->wave.number]],
+        uint8_t synth_value = wts_synth(&song_st.song[song_st.wave_offsets[channel->wave.number]],
                                         channel->note.phase,
-                                        song_st.song[song_st.smooth_offsets[channel->smooth.number]],
+                                        &song_st.song[song_st.smooth_offsets[channel->smooth.number]],
                                         channel->smooth.phase,
                                         channel->volume);
 
