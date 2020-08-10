@@ -110,7 +110,7 @@ inline static void wts_init_song(song_t *song_st, uint16_t *song)
         }
         else
         {
-            song_st->channels[i].data.offset = song_st->channels[0].data.offset + song_st->channels[i-1].data.size; //TODO [i-1].offset+[i-1].datasize?
+            song_st->channels[i].data.offset = song_st->channels[i-1].data.offset + song_st->channels[i-1].data.size;
         }
 
         song_st->channels[i].data.index = song_st->channels[i].data.offset;
