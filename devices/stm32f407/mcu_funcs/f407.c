@@ -2,14 +2,6 @@
 
 #define TIMER_PERIOD 1750 //48kHz PWM freq
 
-void f407_msDelay(uint32_t ms)
-{
-    volatile uint32_t i;
-    RCC_ClocksTypeDef rcc;
-    RCC_GetClocksFreq(&rcc);
-    for (int i = rcc.HCLK_Frequency / 10 / 1000 * ms; i != 0; i--);
-}
-
 inline static void f407_init_gpio()
 {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);

@@ -17,7 +17,7 @@ void pl_stop_play()
     ma_disable_pwm();
 }
 
-void pl_play_song() //TODO rewrite with argument but reduce global variables
+void pl_play_song()
 {
     if (!wts_is_full())
     {
