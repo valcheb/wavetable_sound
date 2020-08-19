@@ -184,37 +184,19 @@ inline static void wts_smooth_phase_routine(smooth_t *smooth)
     }
 }
 
-inline static void wts_cook_channel(channel_t *channel)
+inline static uint8_t wts_cook_channel(channel_t *channel)
 {
-    if (channel->note.length != 0)
-    {
-        uint8_t synth_value = wts_synth(&song_st.song[song_st.wave_offsets[channel->wave.number]],
+    uint8_t synth_value = wts_synth(&song_st.song[song_st.wave_offsets[channel->wave.number]],
                                         channel->note.phase,
                                         &song_st.song[song_st.smooth_offsets[channel->smooth.number]],
                                         channel->smooth.phase,
                                         channel->volume);
 
-        ring_put(&data_ring, synth_value);
+    wts_smooth_phase_routine(&channel->smooth);
+    wts_note_phase_routine(&channel->note, (channel->wave.length-1)*ACCURACY);
+    channel->note.length--;
 
-        wts_smooth_phase_routine(&channel->smooth);
-        wts_note_phase_routine(&channel->note, (channel->wave.length-1)*ACCURACY);
-        channel->note.length--;
-    }
-    else if (channel->data.index < (channel->data.offset + channel->data.size))
-    {
-        uint16_t temp = song_st.song[channel->data.index];
-
-        if (wts_is_note_byte(temp))
-        {
-            wts_prepare_note(channel, temp, &song_st);
-        }
-        else
-        {
-            wts_prepare_channel(channel, temp, &song_st);
-        }
-
-        channel->data.index++;
-    }
+    return synth_value;
 }
 
 void wts_init(uint16_t *song)
@@ -244,10 +226,54 @@ uint8_t wts_get_value()
     return ring_pop(&data_ring);
 }
 
+inline static void wts_mix_channels_headroom(uint8_t data, uint8_t *cur_chan, uint8_t chan_num)
+{
+    static uint16_t sum = 0;
+    sum += data;
+    (*cur_chan)++;
+
+    if ( (*cur_chan) >= chan_num)
+    {
+        ring_put(&data_ring, (uint8_t)(sum / chan_num));
+        sum = 0;
+        *cur_chan = 0;
+    }
+}
+
+inline static bool wts_is_note_end(note_t *note)
+{
+    return note->length == 0;
+}
+
+inline static bool wts_is_channel_data_end(channel_t *channel)
+{
+    return channel->data.index == (channel->data.offset + channel->data.size);
+}
+
 void wts_cook_data()
 {
-    wts_cook_channel(&song_st.channels[song_st.current_chan]);
-    song_st.current_chan++;
-    if (song_st.current_chan >= song_st.chan_number)
-        song_st.current_chan = 0;
+    channel_t *channel = &song_st.channels[song_st.current_chan];
+    uint8_t synth_value = 0;
+
+    if (!wts_is_note_end(&channel->note))
+    {
+        synth_value = wts_cook_channel(channel);
+    }
+    else if (!wts_is_channel_data_end(channel))
+    {
+        uint16_t temp = song_st.song[channel->data.index];
+
+        if (wts_is_note_byte(temp))
+        {
+            wts_prepare_note(channel, temp, &song_st);
+        }
+        else
+        {
+            wts_prepare_channel(channel, temp, &song_st);
+        }
+
+        channel->data.index++;
+    }
+
+    wts_mix_channels_headroom(synth_value, &song_st.current_chan, song_st.chan_number);
 }
