@@ -240,6 +240,38 @@ inline static void wts_mix_channels_headroom(uint8_t data, uint8_t *cur_chan, ui
     }
 }
 
+/*inline static uint16_t wts_heron_square(uint32_t a)
+{
+    uint16_t x = ACCURACY;
+    a *= ACCURACY * ACCURACY;
+
+    for (int i = 0; i < 10; i++)
+    {
+        uint16_t xnew = (uint16_t)(x + a / x) / 2;
+
+        if (xnew == x)
+            return xnew;
+        else
+            x = xnew;
+    }
+
+    return x;
+}
+
+inline static void mix_channels_rms(uint8_t data, uint8_t *cur_chan, uint8_t chan_num)
+{
+    static uint32_t sum = 0;
+    sum += data * data;
+    (*cur_chan)++;
+
+    if ( (*cur_chan) >= chan_num)
+    {
+        ring_put(&data_ring, (uint8_t)(wts_heron_square(sum / chan_num) / ACCURACY) );
+        sum = 0;
+        *cur_chan = 0;
+    }
+}*/
+
 inline static bool wts_is_note_end(note_t *note)
 {
     return note->length == 0;
