@@ -36,7 +36,7 @@ inline static uint8_t wts_linear_interpole(uint16_t *arr, uint32_t i)
 
 inline static uint32_t wts_calculate_duration(uint8_t dur, uint8_t dur_m, uint8_t bpm, uint8_t rate_i, uint8_t chan)
 {
-    uint32_t d = rate[rate_i] * KILO / chan * DURATION_BASE / bpm / durations[dur];
+    uint32_t d = rate[rate_i] * KILO /*/ chan*/ * DURATION_BASE / bpm / durations[dur];
     switch(dur_m)
     {
         default:
@@ -49,7 +49,7 @@ inline static uint32_t wts_calculate_duration(uint8_t dur, uint8_t dur_m, uint8_
 
 inline static uint32_t wts_calculate_increment(uint8_t note, uint16_t wave_len, uint8_t rate_i, uint8_t chan)
 {
-    return (uint32_t)wave_len * note_freq[note] / rate[rate_i] / KILO * chan;
+    return (uint32_t)wave_len * note_freq[note] / rate[rate_i] / KILO /** chan*/;
 }
 
 inline static void wts_fill_offsets(uint16_t *dest, uint16_t *sizes, uint8_t count, uint32_t start_offset)
