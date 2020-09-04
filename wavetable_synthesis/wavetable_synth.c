@@ -222,7 +222,7 @@ bool wts_is_continue()
 
 uint8_t wts_get_value()
 {
-    song_st.song_len--;
+    song_st.song_len -= song_st.chan_number;
     return ring_pop(&data_ring);
 }
 
