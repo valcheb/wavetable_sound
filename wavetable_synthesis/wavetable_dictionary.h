@@ -3,7 +3,13 @@
 
 #include "stdint.h"
 
-#define ACCURACY           100
+#define ACCURACY           1024
+/* about ACCURACY
+this value was chosen because of several reasons.
+1) should avoid float point calculation, so multiply and divide values on this constant
+2) several expressions in wavetable_synth module may have wrong results if ACCURACY will less than 1000
+3) stm32f030 haven't hardware division, but division on the degree of two faster than others dividers
+*/
 #define CHANNEL_MAX        4
 #define WAVE_MAX           16
 #define SMOOTH_MAX         8

@@ -133,11 +133,11 @@ inline static void wts_init_song(song_t *song_st, uint16_t *song)
 inline static uint8_t wts_synth(uint16_t *wave, uint32_t phase, uint16_t *smooth, uint32_t smooth_i, uint32_t volume)
 {
     uint8_t interpolated_wave = wts_linear_interpole(wave, phase);
-    uint32_t interpolated_smooth = smooth[smooth_i] * 1000 / 256;
-    uint32_t vol = volume * 1000 / 256; //TODO improve volume calculation
+    uint32_t interpolated_smooth = smooth[smooth_i] * ACCURACY / 256;
+    uint32_t vol = volume * ACCURACY / 256; //TODO improve volume calculation
     return (uint8_t)
     (
-        interpolated_wave * interpolated_smooth * vol / 1000 / 1000
+        interpolated_wave * interpolated_smooth * vol / ACCURACY / ACCURACY
     );
 }
 
