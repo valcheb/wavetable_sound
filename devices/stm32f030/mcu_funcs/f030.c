@@ -89,3 +89,27 @@ void TIM14_IRQHandler()
     TIM_ClearITPendingBit(TIM14, TIM_IT_Update);
     while (TIM_GetITStatus(TIM14, TIM_IT_Update) == SET) {__NOP;}
 }
+
+volatile uint32_t systick_clock = 0;
+
+void f030_init_systick()
+{
+    RCC_ClocksTypeDef RCC_Clocks;
+    RCC_GetClocksFreq(&RCC_Clocks);
+    SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000);
+}
+
+void f030_systick_start_measure()
+{
+    systick_clock = 0;
+}
+
+uint32_t f030_systick_stop_measure()
+{
+    return systick_clock;
+}
+
+void SysTick_Handler()
+{
+   systick_clock++;
+}

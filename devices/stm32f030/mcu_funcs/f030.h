@@ -16,4 +16,8 @@ void f030_disable_pwm();
 void f030_pwm_play(uint8_t data);
 bool f030_is_data_needed();
 
+void f030_init_systick();
+void f030_systick_start_measure();
+uint32_t f030_systick_stop_measure();
+
 #endif /*F030_H_*/

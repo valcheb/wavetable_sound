@@ -16,4 +16,8 @@ void f407_disable_pwm();
 void f407_pwm_play(uint8_t data);
 bool f407_is_data_needed();
 
+void f407_init_systick();
+void f407_systick_start_measure();
+uint32_t f407_systick_stop_measure();
+
 #endif /*F407_H_*/

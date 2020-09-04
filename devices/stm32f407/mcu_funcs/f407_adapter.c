@@ -25,3 +25,18 @@ void ma_disable_pwm()
 {
     f407_disable_pwm();
 }
+
+void ma_init_systick()
+{
+    f407_init_systick();
+}
+
+void ma_systick_start_measure()
+{
+    f407_systick_start_measure();
+}
+
+uint32_t ma_systick_stop_measure()
+{
+    return f407_systick_stop_measure();
+}
